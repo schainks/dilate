@@ -1,0 +1,26 @@
+#!/bin/bash
+# Copyright(c)2012 David Schainker. Software license GPL version 3.
+# Updates:
+# March 15, 2012 first version released
+
+
+FILE="$1"
+FILENAME=$(basename "$FILE")
+FILETYPE=${1/*./}
+
+
+if [ -n "$FILE" ];
+  then
+     echo $FILENAME
+     echo $FILETYPE
+     mencoder -ovc copy -oac mp3lame -speed 0.8 -srate 44100 "$FILE" -o "slow$FILENAME"
+     ffmpeg -y -vn -i "slow$FILENAME" slow.wav
+     sox slow.wav slow_pitched.wav pitch 400
+     mencoder -ovc copy -nosound -speed 0.8 "$FILE" -o "slow_no_sound$FILENAME"
+     mencoder -ovc copy -audiofile slow_pitched.wav -oac mp3lame "slow_no_sound$FILENAME" -o "80 slow$FILENAME"
+     echo "cleaning up"
+     rm slow.wav slow_pitched.wav "slow_no_sound$FILENAME" "slow$FILENAME" 
+else
+  echo "./converter [file.avi]"
+  echo "in fact, almost any format should be supported"
+fi
