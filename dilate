@@ -23,9 +23,9 @@ FILETYPE=${1/*./}
 
 if [ -z "$2" ]
 then
-	SPEED="80"
+	SPEED=$(echo "80 / 100" | bc -l)
 else 
-	SPEED="$2"
+	SPEED=$(echo "$2 / 100" | bc -l)"
 fi
 
 PITCH=$((($SPEED * 10) / 2))
@@ -36,7 +36,7 @@ if [ -n "$FILE" ];
      mencoder -ovc copy -oac mp3lame -speed "$SPEED" -srate 44100 "$FILE" -o "slow$FILENAME"
      ffmpeg -y -vn -i "slow$FILENAME" slow.wav
      sox slow.wav slow_pitched.wav pitch "$PITCH"
-     mencoder -ovc copy -nosound -speed "$SPEED" 0.8 "$FILE" -o "slow_no_sound$FILENAME"
+     mencoder -ovc copy -nosound -speed "$SPEED" "$FILE" -o "slow_no_sound$FILENAME"
      mencoder -ovc copy -audiofile slow_pitched.wav -oac mp3lame "slow_no_sound$FILENAME" -o "80 slow$FILENAME"
      echo "cleaning up"
      rm slow.wav slow_pitched.wav "slow_no_sound$FILENAME" "slow$FILENAME" 
