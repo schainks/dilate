@@ -33,10 +33,6 @@ PITCH=$((($SPEED * 10) / 2))
 
 if [ -n "$FILE" ];
   then
-     # echo $FILENAME
-     # echo $FILETYPE
-     # echo $SPEED
-     # echo $PITCH
      mencoder -ovc copy -oac mp3lame -speed "$SPEED" -srate 44100 "$FILE" -o "slow$FILENAME"
      ffmpeg -y -vn -i "slow$FILENAME" slow.wav
      sox slow.wav slow_pitched.wav pitch "$PITCH"
