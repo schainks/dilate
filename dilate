@@ -1,26 +1,43 @@
 #!/bin/bash
 # Copyright(c)2012 David Schainker. Software license GPL version 3.
+#   This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 # Updates:
 # March 15, 2012 first version released
-
+# November 30, 2012 added command line flags for speed
 
 FILE="$1"
 FILENAME=$(basename "$FILE")
 FILETYPE=${1/*./}
+
+SPEED="$2"
+
+PITCH=$((($SPEED * 10) / 2))
 
 
 if [ -n "$FILE" ];
   then
      echo $FILENAME
      echo $FILETYPE
-     mencoder -ovc copy -oac mp3lame -speed 0.8 -srate 44100 "$FILE" -o "slow$FILENAME"
+     mencoder -ovc copy -oac mp3lame -speed "$SPEED" -srate 44100 "$FILE" -o "slow$FILENAME"
      ffmpeg -y -vn -i "slow$FILENAME" slow.wav
-     sox slow.wav slow_pitched.wav pitch 400
-     mencoder -ovc copy -nosound -speed 0.8 "$FILE" -o "slow_no_sound$FILENAME"
+     sox slow.wav slow_pitched.wav pitch "$PITCH"
+     mencoder -ovc copy -nosound -speed "$SPEED" 0.8 "$FILE" -o "slow_no_sound$FILENAME"
      mencoder -ovc copy -audiofile slow_pitched.wav -oac mp3lame "slow_no_sound$FILENAME" -o "80 slow$FILENAME"
      echo "cleaning up"
      rm slow.wav slow_pitched.wav "slow_no_sound$FILENAME" "slow$FILENAME" 
 else
-  echo "./converter [file.avi]"
-  echo "in fact, almost any format should be supported"
+  echo "./converter [file.avi] [speed]"
+  echo "EXAMPLE: ./converter Movie.avi 80 -- this will reencode Movie.avi at 80% speed. "
 fi
